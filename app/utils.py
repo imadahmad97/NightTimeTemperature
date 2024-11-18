@@ -19,76 +19,75 @@ from datetime import datetime, timedelta, timezone, time
 import requests
 
 
-def get_sun_times(lat, lng):
-    """Fetches user's sun phase times for given coordinates.
+class Validator: 
+    @staticmethod
+    def validate_coordinates(lat, lng):
+        if not isinstance(lat, (int, float)) or not isinstance(lng, (int, float)):
+            raise ValueError("Latitude and longitude must be numbers")
 
-    Args:
-    lat (float): User's latitude
-    lng (float): User's longitude
+        if lat < -90 or lat > 90:
+            raise ValueError("Latitude must be between -90 and 90 degrees")
 
-    Returns:
-    dict: Contains timezone-aware datetime.time objects for four sun phases: sunrise, sunset,
-    morning_twilight, night_twilight
+        if lng < -180 or lng > 180:
+            raise ValueError("Longitude must be between -180 and 180 degrees")
 
-    Raises:
-    ValueError: If coordinates are invalid or API response format is incorrect
-    RuntimeError: If API request fails or response processing fails
-    """
-    # Input validation for latitude and longitude
-    if not isinstance(lat, (int, float)) or not isinstance(lng, (int, float)):
-        raise ValueError("Latitude and longitude must be numbers")
-
-    if lat < -90 or lat > 90:
-        raise ValueError("Latitude must be between -90 and 90 degrees")
-
-    if lng < -180 or lng > 180:
-        raise ValueError("Longitude must be between -180 and 180 degrees")
-
-    base_url = "https://api.sunrise-sunset.org/json?"
-    url = f"{base_url}lat={lat}&lng={lng}"
-
-    # Attempt to connect to API, read JSON time dictionary response, and validate response
-    try:
-        response = requests.get(url, timeout=20)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        raise RuntimeError(f"Error fetching sun times: {e}") from e
-
-    try:
-        time_dict = response.json()
-    except ValueError as e:
-        raise RuntimeError(f"Error parsing JSON response: {e}") from e
-
-    if "results" not in time_dict:
-        raise requests.RequestException(
-            "Invalid API response format: 'results' key missing"
-        )
-
-    time_dict = time_dict["results"]
-
-    # Extract and validate required keys from the API response
-    required_keys = ["sunrise", "sunset", "civil_twilight_begin", "civil_twilight_end"]
+    @staticmethod
+    def validate_ 
+    required_keys = ["sunrise", "sunset", "morning_twilight", "night_twilight"]
     for key in required_keys:
-        if key not in time_dict:
-            raise RuntimeError(f"Invalid API response format: '{key}' key missing")
+        if key not in sun_times:
+            raise KeyError(f"Missing key in sun_times: '{key}'")
 
-    # Parse time strings and create sun_times dictionary
-    try:
-        sun_times = {
+
+class SunTimesAPI:
+    BASE_URL = "https://api.sunrise-sunset.org/json?"  # EDIT: Change to config file
+
+    @staticmethod
+    def fetch_sun_times(lat, lng):
+        url = f"{SunTimesAPI.BASE_URL}lat={lat}&lng={lng}"
+        try:
+            response = requests.get(url, timeout=20)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            raise RuntimeError(f"Error fetching sun times: {e}") from e
+
+class ReseponseHandler:
+    @staticmethod
+    def validate_response(time_dict):
+        if "results" not in time_dict:
+            raise requests.RequestException(
+                "Invalid API response format, 'results' key missing"
+            )
+        return time_dict["results"]
+
+    @staticmethod
+    def extract_required_keys(time_dict):
+        required_keys = [
+            "sunrise",
+            "sunset",
+            "civil_twilight_begin",
+            "civil_twilight_end",
+        ]
+        for key in required_keys:
+            if key not in time_dict:
+                raise RuntimeError(f"Invalid API response format: '{key}' key missing")
+            return time_dict
+
+class TimeParser:
+    @staticmethod
+    def parse_sun_times(time_dict):
+        try:
+            sun_times = {
             "sunrise": datetime.strptime(time_dict["sunrise"], "%I:%M:%S %p").time(),
             "sunset": datetime.strptime(time_dict["sunset"], "%I:%M:%S %p").time(),
-            "morning_twilight": datetime.strptime(
-                time_dict["civil_twilight_begin"], "%I:%M:%S %p"
-            ).time(),
-            "night_twilight": datetime.strptime(
-                time_dict["civil_twilight_end"], "%I:%M:%S %p"
-            ).time(),
+            "sunrise": datetime.strptime(time_dict["sunrise"], "%I:%M:%S %p").time(),
+            "sunrise": datetime.strptime(time_dict["sunrise"], "%I:%M:%S %p").time()
         }
-    except (ValueError, KeyError) as e:
-        raise RuntimeError(f"Error processing sun times: {e}") from e
-
-    return sun_times
-
+        
+        except (ValueError, KeyError) as e:
+            raise RuntimeError(f"Error processing sun times: {e}" from e)
+        return sun_times
 
 def date_adjustment(lat, lng):
     """Adjusts date if sun phase transition crosses midnight

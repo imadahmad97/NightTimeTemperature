@@ -65,8 +65,7 @@ def register_routes(app):
         try:
             if current_app.config["MOCK_VALUES"]:
                 # Use mock values for testing/development environments
-                calculate_temp(lat, lng)
-                temperature = 15.0
+                temperature = calculate_temp(lat, lng)
             else:
                 # Calculate actual temperature using external service/calculation
                 temperature = calculate_temp(lat, lng)

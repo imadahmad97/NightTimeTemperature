@@ -1361,7 +1361,7 @@ class TestCalulculateTemp(unittest.TestCase):
         # Act
         result = calculate_temp(0, 0)
 
-        # Assert: At 5:15 PM, we're 15 minutes into a 120-minute twilight period, so we're 1/8
+        # Assert: At 5:15 AM, we're 15 minutes into a 120-minute twilight period, so we're 1/8
         # through the transition from low to high temp
         expected_temp = self.lo_temp + (self.hi_temp - self.lo_temp) * (1 / 8)
         self.assertAlmostEqual(result, expected_temp, places=1)
@@ -1431,7 +1431,7 @@ class TestCalulculateTemp(unittest.TestCase):
         result = calculate_temp(0, 0)
 
         # Assert: Calculate expected temperature at 12:15 AM, we're 75 minutes into a 90-minute
-        # twilight period, so we're 5/6 through the transition from high to low temp
+        # twilight period, so we're 11/12 through the transition from high to low temp
         twilight_progress = 11 / 12
         expected_temp = self.hi_temp - (self.hi_temp - self.lo_temp) * (
             twilight_progress
