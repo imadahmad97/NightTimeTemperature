@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone, time
+from sun_times import SunTimes, SunTimesAPI
 
 
 class ReseponseHandler:
@@ -8,37 +9,38 @@ class ReseponseHandler:
 
     @staticmethod
     def parse_sun_times(times_as_strings):
-        sun_times = {
-            "sunrise": datetime.strptime(
+        return SunTimes(
+            sunrise=datetime.strptime(
                 times_as_strings["sunrise"], "%I:%M:%S %p"
             ).time(),
-            "sunset": datetime.strptime(
-                times_as_strings["sunset"], "%I:%M:%S %p"
+            sunset=datetime.strptime(times_as_strings["sunset"], "%I:%M:%S %p").time(),
+            morning_twilight=datetime.strptime(
+                times_as_strings["civil_twilight_begin"], "%I:%M:%S %p"
             ).time(),
-            "night_twilight": datetime.strptime(
-                times_as_strings["night_twilight"], "%I:%M:%S %p"
+            night_twilight=datetime.strptime(
+                times_as_strings["civil_twilight_end"], "%I:%M:%S %p"
             ).time(),
-            "morning_twilight": datetime.strptime(
-                times_as_strings["morning_twilight"], "%I:%M:%S %p"
-            ).time(),
-        }
-        return sun_times
+        )
 
     @staticmethod
-    def combines_times_with_date(raw_sun_times):
+    def combines_times_with_date(sun_times):
         # Combine sun times with current date
-        user_time = datetime.now(timezone.utc)
-        today = user_time.date()
-        sunrise = datetime.combine(today, raw_sun_times["sunrise"], tzinfo=timezone.utc)
-        sunset = datetime.combine(today, raw_sun_times["sunset"], tzinfo=timezone.utc)
-        morning_twilight = datetime.combine(
-            today, raw_sun_times["morning_twilight"], tzinfo=timezone.utc
+        sun_times.user_time = datetime.now(timezone.utc)
+        today = sun_times.user_time.date()
+        sun_times.sunrise = datetime.combine(
+            today, sun_times.sunrise, tzinfo=timezone.utc
         )
-        night_twilight = datetime.combine(
-            today, raw_sun_times["night_twilight"], tzinfo=timezone.utc
+        sun_times.sunset = datetime.combine(
+            today, sun_times.sunset, tzinfo=timezone.utc
+        )
+        sun_times.morning_twilight = datetime.combine(
+            today, sun_times.morning_twilight, tzinfo=timezone.utc
+        )
+        sun_times.night_twilight = datetime.combine(
+            today, sun_times.night_twilight, tzinfo=timezone.utc
         )
 
-        return user_time, sunrise, sunset, morning_twilight, night_twilight
+        return sun_times
 
     @staticmethod
     def handle_response(raw_api_response):
@@ -47,48 +49,87 @@ class ReseponseHandler:
         )
         sun_times = ReseponseHandler.parse_sun_times(string_sun_times)
         sun_times_with_dates = ReseponseHandler.combines_times_with_date(sun_times)
-
+        print(sun_times_with_dates)
         return sun_times_with_dates
 
 
 class DateAdjustment:
     @staticmethod
-    def sunrise_before_twilight(user_time, sunrise, sunset, night_twilight):
-        if time(00, 00) <= user_time.time() < sunrise.time():
-            user_time += timedelta(days=1)
-        sunrise += timedelta(days=1)
-        sunset += timedelta(days=1)
-        night_twilight += timedelta(days=1)
+    def sunrise_before_twilight(sun_times):
+        if time(00, 00) <= sun_times.user_time.time() < sun_times.unrise.time():
+            sun_times.user_time += timedelta(days=1)
+        sun_times.sunrise += timedelta(days=1)
+        sun_times.sunset += timedelta(days=1)
+        sun_times.night_twilight += timedelta(days=1)
+
+        return sun_times
 
     @staticmethod
-    def sunset_before_sunrise(user_time, sunset, night_twilight):
-        if time(00, 00) <= user_time.time() < night_twilight.time():
-            user_time += timedelta(days=1)
-        sunset += timedelta(days=1)
-        night_twilight += timedelta(days=1)
+    def sunset_before_sunrise(sun_times):
+        if time(00, 00) <= sun_times.user_time.time() < sun_times.night_twilight.time():
+            sun_times.user_time += timedelta(days=1)
+        sun_times.sunset += timedelta(days=1)
+        sun_times.night_twilight += timedelta(days=1)
+
+        return sun_times
 
     @staticmethod
-    def night_twilight_before_sunset(user_time, night_twilight):
-        if time(00, 00) <= user_time.time() < night_twilight.time():
-            user_time += timedelta(days=1)
-        night_twilight += timedelta(days=1)
+    def night_twilight_before_sunset(sun_times):
+        if time(00, 00) <= sun_times.user_time.time() < sun_times.night_twilight.time():
+            sun_times.user_time += timedelta(days=1)
+        sun_times.night_twilight += timedelta(days=1)
+
+        return sun_times
 
     @staticmethod
-    def calculate_midday_period(sunrise, sunset, morning_twilight, night_twilight):
-        midday_period_begins = sunrise + (sunrise - morning_twilight)
-        midday_period_ends = sunset - (night_twilight - sunset)
+    def adjust_dates(sun_times):
+        if sun_times.sunrise < sun_times.morning_twilight:
+            sun_times = DateAdjustment.sunrise_before_twilight(sun_times)
 
-        return midday_period_begins, midday_period_ends
+        if sun_times.sunset < sun_times.sunrise:
+            sun_times = DateAdjustment.sunset_before_sunrise(sun_times)
+
+        if sun_times.night_twilight < sun_times.sunset:
+            sun_times.user_time, sun_times.night_twilight = (
+                DateAdjustment.night_twilight_before_sunset(sun_times)
+            )
+
+        return sun_times
+
+
+class MiddayPeriodCalculations:
+    @staticmethod
+    def calculate_midday_period(sun_times):
+        sun_times.midday_period_begins = sun_times.sunrise + (
+            sun_times.sunrise - sun_times.morning_twilight
+        )
+        sun_times.midday_period_ends = sun_times.sunset - (
+            sun_times.night_twilight - sun_times.sunset
+        )
 
     @staticmethod
-    def midday_period_adjustment(
-        midday_period_begins, midday_period_ends, sunrise, morning_twilight
-    ):
+    def midday_period_adjustment(sun_times):
         # Increment morning_period_end and midday_period_begins if out of order
-        if midday_period_begins < sunrise or midday_period_begins < morning_twilight:
-            midday_period_begins += timedelta(days=1)
+        if (
+            sun_times.midday_period_begins < sun_times.sunrise
+            or sun_times.midday_period_begins < sun_times.morning_twilight
+        ):
+            sun_times.midday_period_begins += timedelta(days=1)
 
-        if midday_period_ends < midday_period_begins:
-            midday_period_ends += timedelta(days=1)
+        if sun_times.midday_period_ends < sun_times.midday_period_begins:
+            sun_times.midday_period_ends += timedelta(days=1)
 
-    def adjust_date()
+        return sun_times
+
+    @staticmethod
+    def calculate_and_adjust_midday_periods(sun_times):
+        response_with_midday_period = MiddayPeriodCalculations.calculate_midday_period(
+            sun_times
+        )
+        response_with_adjusted_midday_period = (
+            MiddayPeriodCalculations.midday_period_adjustment(
+                response_with_midday_period
+            )
+        )
+
+        return response_with_adjusted_midday_period
