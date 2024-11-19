@@ -23,7 +23,7 @@ Dependencies:
 """
 
 from flask import request, jsonify, current_app
-from .utils import calculate_temp
+from .calculate_temp import calculate_temp
 
 
 def register_routes(app):

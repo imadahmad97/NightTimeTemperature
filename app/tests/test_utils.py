@@ -35,7 +35,7 @@ from unittest.mock import patch
 from datetime import datetime, time, timezone, date
 import json
 import requests
-from app.utils import get_sun_times, date_adjustment, calculate_temp
+from app.calculate_temp import get_sun_times, date_adjustment, calculate_temp
 
 
 class TestGetSunTimes(unittest.TestCase):
