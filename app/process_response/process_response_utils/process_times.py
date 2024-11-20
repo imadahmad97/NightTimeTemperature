@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone, time
-from .sun_times import SunTimes, SunTimesAPI
+from .sun_times import SunTimes
 
 
 class ReseponseHandler:

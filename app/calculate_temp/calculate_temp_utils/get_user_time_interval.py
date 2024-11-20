@@ -16,6 +16,3 @@ class GetUserTimeInterval:
         )
 
         return user_prop
-
-
-6043453565
