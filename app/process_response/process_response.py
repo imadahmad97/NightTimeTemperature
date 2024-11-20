@@ -19,19 +19,4 @@ class ProcessAPICall:
                 date_adjusted_response
             )
         )
-        # print(
-        #     processed_response.sunrise,
-        #     "\n",
-        #     processed_response.sunset,
-        #     "\n",
-        #     processed_response.morning_twilight,
-        #     "\n",
-        #     processed_response.night_twilight,
-        #     "\n",
-        #     processed_response.midday_period_begins,
-        #     "\n",
-        #     processed_response.midday_period_ends,
-        #     "\n",
-        #     processed_response.user_time,
-        # )
         return processed_response
