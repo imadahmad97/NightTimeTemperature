@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone, time
-from sun_times import SunTimes, SunTimesAPI
+from .sun_times import SunTimes, SunTimesAPI
 
 
 class ReseponseHandler:
@@ -49,7 +49,6 @@ class ReseponseHandler:
         )
         sun_times = ReseponseHandler.parse_sun_times(string_sun_times)
         sun_times_with_dates = ReseponseHandler.combines_times_with_date(sun_times)
-        print(sun_times_with_dates)
         return sun_times_with_dates
 
 
@@ -106,6 +105,8 @@ class MiddayPeriodCalculations:
         sun_times.midday_period_ends = sun_times.sunset - (
             sun_times.night_twilight - sun_times.sunset
         )
+
+        return sun_times
 
     @staticmethod
     def midday_period_adjustment(sun_times):
