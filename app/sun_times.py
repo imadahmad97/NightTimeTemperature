@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 class AbstractSunTimes(ABC):
     @abstractmethod
-    def set_user_time(self, user_time=None):
+    def set_user_time(self):
         """Sets the user time, defaulting to the current UTC time."""
         pass
 
@@ -38,10 +38,10 @@ class SunTimes(AbstractSunTimes):
         self.midday_period_ends = midday_period_ends
         self.user_time = user_time
 
-    def set_user_time(self, user_time=None):
-        self.user_time = user_time or datetime.now(timezone.utc)
+    def set_user_time(self) -> None:
+        self.user_time = datetime.now(timezone.utc)
 
-    def combine_times_with_date(self):
+    def combine_times_with_date(self) -> None:
         self.set_user_time()
 
         date = self.user_time.date()
@@ -55,7 +55,7 @@ class SunTimes(AbstractSunTimes):
             date, self.night_twilight, tzinfo=timezone.utc
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"SunTimes(sunrise={self.sunrise}, sunset={self.sunset}, "
             f"morning_twilight={self.morning_twilight}, night_twilight={self.night_twilight}, "

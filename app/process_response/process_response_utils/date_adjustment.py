@@ -32,7 +32,7 @@ class AbstractDateAdjustment(ABC):
 
 class DateAdjustment(AbstractDateAdjustment):
     def sunrise_before_twilight(self, sun_times: SunTimes) -> SunTimes:
-        if time(00, 00) <= sun_times.user_time.time() < sun_times.unrise.time():
+        if time(00, 00) <= sun_times.user_time.time() < sun_times.sunrise.time():
             sun_times.user_time += timedelta(days=1)
         sun_times.sunrise += timedelta(days=1)
         sun_times.sunset += timedelta(days=1)

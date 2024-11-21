@@ -11,12 +11,10 @@ Dependencies:
 """
 
 from flask import Flask
-
-# from .app_old.config import get_config
 from app.routes import register_routes
 
 
-def create_app():
+def create_app() -> Flask:
     """Create and configure an instance of the Flask application.
 
     Initializes a new Flask app, loads the appropriate configuration, registers all routes, and
@@ -30,9 +28,8 @@ def create_app():
 
     # Load the configuration (prod or dev) for the app
     app.config.from_pyfile("../config.py")
-    print(app.config["LO_TEMP"])
 
-    # # Register all routes with the application
+    # Register all routes with the application
     register_routes(app)
 
     return app
