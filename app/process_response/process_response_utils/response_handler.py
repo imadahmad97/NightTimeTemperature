@@ -19,8 +19,9 @@ class AbstractResponseHandler(ABC):
     def handle_response(self, raw_api_response):
         string_sun_times = self.extract_times_from_API_response(raw_api_response)
         sun_times = self.parse_sun_times(string_sun_times)
-        sun_times_with_dates = self.combine_times_with_date(sun_times)
-        return sun_times_with_dates
+        sun_times.set_user_time()
+        sun_times.combine_times_with_date()
+        return sun_times
 
 
 class ResponseHandler(AbstractResponseHandler):
@@ -40,22 +41,3 @@ class ResponseHandler(AbstractResponseHandler):
                 times_as_strings["civil_twilight_end"], "%I:%M:%S %p"
             ).time(),
         )
-
-    def combine_times_with_date(self, sun_times):
-        # Combine sun times with current date
-        sun_times.user_time = datetime.now(timezone.utc)
-        today = sun_times.user_time.date()
-        sun_times.sunrise = datetime.combine(
-            today, sun_times.sunrise, tzinfo=timezone.utc
-        )
-        sun_times.sunset = datetime.combine(
-            today, sun_times.sunset, tzinfo=timezone.utc
-        )
-        sun_times.morning_twilight = datetime.combine(
-            today, sun_times.morning_twilight, tzinfo=timezone.utc
-        )
-        sun_times.night_twilight = datetime.combine(
-            today, sun_times.night_twilight, tzinfo=timezone.utc
-        )
-
-        return sun_times
