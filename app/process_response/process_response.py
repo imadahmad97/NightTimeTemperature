@@ -2,12 +2,13 @@ from .process_response_utils.response_handler import ResponseHandler
 from .process_response_utils.midday_calculator import MiddayPeriodCalculator
 from .process_response_utils.date_adjustment import DateAdjustment
 from .process_response_utils.sun_times_api import SunTimesAPI
+from app.sun_times import SunTimes
 
 
 class ProcessAPICall:
 
     @staticmethod
-    def process_api_call(lat, lng):
+    def process_api_call(lat: float, lng: float) -> SunTimes:
         response = SunTimesAPI.fetch_sun_times(lat, lng)
 
         response_handler = ResponseHandler()
