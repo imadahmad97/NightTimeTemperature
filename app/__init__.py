@@ -28,8 +28,9 @@ def create_app():
     # Initialize the Flask application
     app = Flask(__name__)
 
-    # # Load the configuration (prod or dev) for the app
-    # app.config.from_object(get_config())
+    # Load the configuration (prod or dev) for the app
+    app.config.from_pyfile("../config.py")
+    print(app.config["LO_TEMP"])
 
     # # Register all routes with the application
     register_routes(app)

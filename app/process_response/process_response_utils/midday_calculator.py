@@ -31,9 +31,8 @@ class MiddayPeriodCalculator(AbstractMiddayPeriodCalculator):
 
         return sun_times
 
-    @staticmethod
     def midday_period_adjustment(self, sun_times):
-        # Increment morning_period_end and midday_period_begins if out of order
+        # Increment midday_period_ends and midday_period_begins if out of order
         if (
             sun_times.midday_period_begins < sun_times.sunrise
             or sun_times.midday_period_begins < sun_times.morning_twilight

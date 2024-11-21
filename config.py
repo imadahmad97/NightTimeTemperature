@@ -1,0 +1,2 @@
+LO_TEMP = 2700
+HI_TEMP = 6000

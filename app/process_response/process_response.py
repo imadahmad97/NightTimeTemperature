@@ -12,8 +12,10 @@ class ProcessAPICall:
 
         response_handler = ResponseHandler()
         midday_calculator = MiddayPeriodCalculator()
+        date_adjustment = DateAdjustment()
+
         formatted_response = response_handler.handle_response(response)
-        date_adjusted_response = DateAdjustment.adjust_dates(formatted_response)
+        date_adjusted_response = date_adjustment.adjust_dates(formatted_response)
         processed_response = midday_calculator.calculate_and_adjust_midday_periods(
             date_adjusted_response
         )
