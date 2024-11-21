@@ -1,4 +1,3 @@
-import requests
 from datetime import datetime, timezone
 from abc import ABC, abstractmethod
 
@@ -10,7 +9,7 @@ class AbstractSunTimes(ABC):
         pass
 
     @abstractmethod
-    def combine_times_with_date(self, date=None):
+    def combine_times_with_date(self):
         """Combines sun times with a given date, defaulting to today."""
         pass
 
@@ -63,17 +62,3 @@ class SunTimes(AbstractSunTimes):
             f"midday_period_begins={self.midday_period_begins}, midday_period_ends={self.midday_period_ends}, "
             f"user_time={self.user_time})"
         )
-
-
-class SunTimesAPI:
-    BASE_URL = "https://api.sunrise-sunset.org/json?"  # EDIT: Change to config file
-
-    @staticmethod
-    def fetch_sun_times(lat, lng):
-        url = f"{SunTimesAPI.BASE_URL}lat={lat}&lng={lng}"
-        try:
-            response = requests.get(url, timeout=20)
-            response.raise_for_status()
-            return response
-        except requests.RequestException as e:
-            raise RuntimeError(f"Error fetching sun times: {e}") from e

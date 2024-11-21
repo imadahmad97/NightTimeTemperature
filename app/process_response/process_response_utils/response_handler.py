@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
-from .sun_times import SunTimes
+from datetime import datetime
+from app.sun_times import SunTimes
 from abc import ABC, abstractmethod
 
 
@@ -10,10 +10,6 @@ class AbstractResponseHandler(ABC):
 
     @abstractmethod
     def parse_sun_times(self, times_as_strings):
-        pass
-
-    @abstractmethod
-    def combine_times_with_date(self, sun_times):
         pass
 
     def handle_response(self, raw_api_response):
