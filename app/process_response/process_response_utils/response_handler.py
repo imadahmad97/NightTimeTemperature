@@ -7,7 +7,7 @@ from typing import Dict
 
 class AbstractResponseHandler(ABC):
     """
-    Abstract base class for converting API responses into SunTime Objects
+    Abstract base class for converting API responses into SunTime Objects.
 
     This class provides a template for response handlers by defining:
     - A method to extract raw time data from the API response.
