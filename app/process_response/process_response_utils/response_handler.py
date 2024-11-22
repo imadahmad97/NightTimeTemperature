@@ -1,8 +1,38 @@
-from datetime import datetime
-from app.sun_times import SunTimes
+"""
+Module: response_handler
+
+This module provides classes and methods for handling API responses from the sunrise-sunset API.
+
+Classes:
+    - AbstractResponseHandler: An abstract base class that defines the template for converting API 
+      responses into `SunTimes` objects. It includes abstract methods for extracting and parsing 
+      time data from the API response.
+    - ResponseHandler: A concrete implementation of `AbstractResponseHandler` that provides specific
+      methods for extracting and parsing time data from the API response.
+
+Usage:
+    The `AbstractResponseHandler` class should be subclassed to create custom response handlers that
+    implement the `extract_times_from_api_response` and `parse_sun_times` methods. The 
+    `ResponseHandler` class provides one such implementation for handling typical sunrise and sunset
+    API responses.
+
+Example:
+    response_handler = ResponseHandler()
+    sun_times = response_handler.handle_response(api_response)
+
+Dependencies:
+    - abc: Provides the abstract base class functionality.
+    - datetime: Used for parsing and handling date and time data.
+    - typing: Provides type hinting for better code readability and maintenance.
+    - requests: Used for handling HTTP requests and responses.
+    - app.sun_times: Contains the `SunTimes` class used to structure the parsed time data.
+"""
+
 from abc import ABC, abstractmethod
-import requests
+from datetime import datetime
 from typing import Dict
+import requests
+from app.sun_times import SunTimes
 
 
 class AbstractResponseHandler(ABC):
@@ -33,7 +63,6 @@ class AbstractResponseHandler(ABC):
 
         Single Responsibility: Extract string times from the API response.
         """
-        pass
 
     @abstractmethod
     def parse_sun_times(self, times_as_strings: Dict[str, str]) -> SunTimes:
@@ -41,14 +70,14 @@ class AbstractResponseHandler(ABC):
         Parses a dictionary of time strings into a SunTimes object.
 
         Args:
-            times_as_strings (Dict[str, str]): A dictionary containing time strings as values and sun phases as keys
+            times_as_strings (Dict[str, str]): A dictionary containing time strings as values and
+            sun phases as keys
 
         Returns:
             SunTimes: An object representing parsed sunrise, sunset, and twilight times.
 
         Single Responsibility: Parsing a strings dictionary into a SunTimes object.
         """
-        pass
 
     def handle_response(self, raw_api_response: requests.models.Response) -> SunTimes:
         """
@@ -64,42 +93,47 @@ class AbstractResponseHandler(ABC):
         Process:
             1. Extracts raw time data using `extract_times_from_API_response`.
             2. Parses the raw data into a SunTimes object using `parse_sun_times`.
-            3. Sets the user's time zone for the SunTimes object.
-            4. Combines the extracted times with the current date.
 
-        Adherence to SRP:
-            Partially adheres to SRP but introduces additional responsibilities:
-            - Delegates data extraction and parsing to other methods (good SRP).
-            - Calls methods to set user time and combine times with the date (potential SRP violation).
-            These operations might belong to the `SunTimes` class or a utility method.
-
-        Suggestion:
-            Consider refactoring `set_user_time` and `combine_times_with_date` into
-            a separate helper or ensuring they are encapsulated in the SunTimes class.
+        Single Responsibility: Formatting the API response into a dictionary that can be read by
+        the process_sun_times method in the SunTimes class.
         """
         string_sun_times = self.extract_times_from_api_response(raw_api_response)
         sun_times = self.parse_sun_times(string_sun_times)
-        sun_times.set_user_time()
-        sun_times.combine_times_with_date()
         return sun_times
 
 
 class ResponseHandler(AbstractResponseHandler):
-    def extract_times_from_API_response(
+    """
+    Concrete implementation of AbstractResponseHandler for handling API responses.
+
+    This class implements the methods to extract and parse time data from the API response.
+    """
+
+    def extract_times_from_api_response(
         self, raw_api_response: requests.models.Response
     ) -> Dict[str, str]:
+        """
+        See base class `AbstractResponseHandler` for full method documentation.
+        """
         return raw_api_response.json()["results"]
 
-    def parse_sun_times(self, times_as_strings: Dict[str, str]) -> SunTimes:
-        return SunTimes(
-            sunrise=datetime.strptime(
+    def parse_sun_times(
+        self, times_as_strings: Dict[str, str]
+    ) -> Dict[str, datetime.time]:
+        """
+        See base class `AbstractResponseHandler` for full method documentation.
+        """
+        return {
+            "sunrise": datetime.strptime(
                 times_as_strings["sunrise"], "%I:%M:%S %p"
             ).time(),
-            sunset=datetime.strptime(times_as_strings["sunset"], "%I:%M:%S %p").time(),
-            morning_twilight=datetime.strptime(
+            "sunset": datetime.strptime(
+                times_as_strings["sunset"], "%I:%M:%S %p"
+            ).time(),
+            "morning_twilight": datetime.strptime(
                 times_as_strings["civil_twilight_begin"], "%I:%M:%S %p"
             ).time(),
-            night_twilight=datetime.strptime(
+            "night_twilight": datetime.strptime(
                 times_as_strings["civil_twilight_end"], "%I:%M:%S %p"
             ).time(),
-        )
+        }

@@ -12,12 +12,19 @@ class ProcessAPICall:
         response = SunTimesAPI.fetch_sun_times(lat, lng)
 
         response_handler = ResponseHandler()
+        sun_times_builder = SunTimes()
         midday_calculator = MiddayPeriodCalculator()
         date_adjustment = DateAdjustment()
 
         formatted_response = response_handler.handle_response(response)
-        date_adjusted_response = date_adjustment.adjust_dates(formatted_response)
-        processed_response = midday_calculator.calculate_and_adjust_midday_periods(
-            date_adjusted_response
+        raw_sun_times_object = sun_times_builder.process_sun_times(formatted_response)
+        date_adjusted_sun_times_object = date_adjustment.adjust_dates(
+            raw_sun_times_object
         )
-        return processed_response
+        processed_sun_times_object = (
+            midday_calculator.calculate_and_adjust_midday_periods(
+                date_adjusted_sun_times_object
+            )
+        )
+
+        return processed_sun_times_object

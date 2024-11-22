@@ -49,7 +49,7 @@ class GetTemp(AbstractGetTemp):
         self.time_calculator = TimeIntervalCalculator()
 
     def user_in_midday_period(self) -> int:
-        return current_app.config["HI_TEMP"].type()
+        return current_app.config["HI_TEMP"]
 
     def user_in_night_period(self) -> int:
         return current_app.config["LO_TEMP"]
