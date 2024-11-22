@@ -16,10 +16,6 @@ Usage:
     `ResponseHandler` class provides one such implementation for handling typical sunrise and sunset
     API responses.
 
-Example:
-    response_handler = ResponseHandler()
-    sun_times = response_handler.handle_response(api_response)
-
 Dependencies:
     - abc: Provides the abstract base class functionality.
     - datetime: Used for parsing and handling date and time data.

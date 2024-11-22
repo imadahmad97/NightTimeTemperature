@@ -1,77 +1,138 @@
-from .get_user_time_interval import TimeIntervalCalculator
-from flask import current_app
+"""
+Module: get_temp
+
+This module provides classes and methods for getting temperature based on user and sun times data.
+
+Classes:
+    - AbstractGetTemp: Abstract base class that defines the template for calculating temperature 
+      based on user time and sun times data. Includes abstract methods for different time intervals.
+    - GetTemp: Concrete implementation of `AbstractGetTemp` that provides specific methods for 
+      calculating temperature based on user time and sun times data.
+
+Usage:
+    The `AbstractGetTemp` class should be subclassed to create custom temperature calculators that 
+    implement the `user_in_midday_period`, `user_in_night_period`, `user_in_morning_twilight`, and 
+    `user_in_night_twilight` methods. The `GetTemp` class provides one such implementation for 
+    handling typical temperature calculations based on user time and sun times data.
+
+Dependencies:
+    - flask: Used for accessing the current Flask application configuration.
+    - abc: Provides the abstract base class functionality.
+"""
+
 from abc import ABC, abstractmethod
-from app.sun_times import SunTimes
+from flask import current_app
 
 
 class AbstractGetTemp(ABC):
-    @abstractmethod
-    def user_in_midday_period(self) -> int:
-        pass
+    """
+    An abstract base class that defines the interface for temperature calculators.
 
-    @abstractmethod
-    def user_in_night_period(self) -> int:
-        pass
+    This class provides abstract methods for calculating temperature based on user time and sun
+    times data. Subclasses must implement these methods to provide specific temperature calculation
+    logic.
 
-    @abstractmethod
-    def user_in_morning_twilight(self, sun_times: SunTimes) -> int:
-        pass
+    Single responsibility: Define the interface for temperature calculators.
+    """
 
+    @staticmethod
     @abstractmethod
-    def user_in_night_twilight(self, sun_times: SunTimes) -> int:
-        pass
+    def user_in_midday_period() -> int:
+        """
+        Calculates the temperature during the midday period.
 
-    def get_temp(self, sun_times: SunTimes) -> int:
-        if (
-            sun_times.midday_period_begins
-            < sun_times.user_time
-            < sun_times.midday_period_ends
-        ):
-            return self.user_in_midday_period()
-        elif (
-            sun_times.morning_twilight
-            <= sun_times.user_time
-            <= sun_times.midday_period_begins
-        ):
-            return self.user_in_morning_twilight(sun_times)
-        elif (
-            sun_times.midday_period_ends
-            <= sun_times.user_time
-            <= sun_times.night_twilight
-        ):
-            return self.user_in_night_twilight(sun_times)
-        else:
-            return self.user_in_night_period()
+        Returns:
+            int: The calculated temperature during the midday period.
+
+        Single Responsibility: Calculate the temperature during the midday period.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def user_in_night_period() -> int:
+        """
+        Calculates the temperature during the night period.
+
+        Returns:
+            int: The calculated temperature during the night period.
+
+        Single Responsibility: Calculate the temperature during the night period.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def user_in_morning_twilight(morning_prop: float) -> int:
+        """
+        Calculates the temperature during the morning twilight period based on sun times data.
+
+        Args:
+            sun_times (SunTimes): A structured object containing processed sun times data.
+
+        Returns:
+            int: The calculated temperature during the morning twilight period.
+
+        Single Responsibility: Calculate the temperature during the morning twilight period.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def user_in_night_twilight(night_prop: float) -> int:
+        """
+        Calculates the temperature during the night twilight period based on sun times data.
+
+        Args:
+            sun_times (SunTimes): A structured object containing processed sun times data.
+
+        Returns:
+            int: The calculated temperature during the night twilight period.
+
+        Single Responsibility: Calculate the temperature during the night twilight period.
+        """
 
 
 class GetTemp(AbstractGetTemp):
-    def __init__(self):
-        self.time_calculator = TimeIntervalCalculator()
+    """
+    Concrete implementation of AbstractGetTemp for calculating temperature based on user time and
+    sun times data.
 
-    def user_in_midday_period(self) -> int:
+    This class implements the methods to calculate temperature during different time intervals
+    based on user time and sun times data.
+
+    Single responsibility: Calculate temperature based on user time and sun times data.
+    """
+
+    @staticmethod
+    def user_in_midday_period() -> int:
+        """
+        See base class `AbstractGetTemp` for full method documentation.
+        """
         return current_app.config["HI_TEMP"]
 
-    def user_in_night_period(self) -> int:
+    @staticmethod
+    def user_in_night_period() -> int:
+        """
+        See base class `AbstractGetTemp` for full method documentation.
+        """
         return current_app.config["LO_TEMP"]
 
-    def user_in_morning_twilight(self, sun_times: SunTimes) -> int:
-        proportion_of_twilight_complete = self.time_calculator.get_user_prop_morning(
-            sun_times
-        )
-
+    @staticmethod
+    def user_in_morning_twilight(morning_prop: float) -> int:
+        """
+        See base class `AbstractGetTemp` for full method documentation.
+        """
         return round(
             current_app.config["LO_TEMP"]
             + (current_app.config["HI_TEMP"] - current_app.config["LO_TEMP"])
-            * proportion_of_twilight_complete
+            * morning_prop
         )
 
-    def user_in_night_twilight(self, sun_times: SunTimes) -> int:
-        proportion_of_twilight_complete = self.time_calculator.get_user_prop_night(
-            sun_times
-        )
-
+    @staticmethod
+    def user_in_night_twilight(night_prop: float) -> int:
+        """
+        See base class `AbstractGetTemp` for full method documentation.
+        """
         return round(
             current_app.config["HI_TEMP"]
             - (current_app.config["HI_TEMP"] - current_app.config["LO_TEMP"])
-            * proportion_of_twilight_complete
+            * night_prop
         )
