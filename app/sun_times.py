@@ -32,9 +32,10 @@ Dependencies:
     - typing: Provides type hinting for better code readability and maintenance.
 """
 
-from datetime import datetime, timezone
+from dataclasses import dataclass, field
+from datetime import datetime, time, timezone
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Optional, Dict
 
 
 class AbstractSunTimes(ABC):
@@ -97,69 +98,71 @@ class AbstractSunTimes(ABC):
         return sun_times
 
 
+@dataclass
 class SunTimes(AbstractSunTimes):
     """
-    Concrete implementation of AbstractSunTimes for handling and processing sun times.
+    A concrete implementation of AbstractSunTimes for handling and processing sun times.
 
-    This class provides methods to:
-    - Set the user time.
-    - Combine sun times with a specific date.
-    - Represent sun times as a string.
+    Attributes:
+        sunrise (Optional[time]): Time of sunrise.
+        sunset (Optional[time]): Time of sunset.
+        morning_twilight (Optional[time]): Time of morning twilight.
+        night_twilight (Optional[time]): Time of night twilight.
+        midday_period_begins (Optional[time]): Time when the midday period begins.
+        midday_period_ends (Optional[time]): Time when the midday period ends.
+        user_time (Optional[datetime]): User-defined time or current UTC time by default.
     """
 
-    def __init__(
-        self,
-        sunrise=None,
-        sunset=None,
-        morning_twilight=None,
-        night_twilight=None,
-        midday_period_begins=None,
-        midday_period_ends=None,
-        user_time=None,
-    ):
-        """
-        Initializes the SunTimes object with optional sun times and user time.
-
-        Args:
-            sunrise (datetime.time, optional): Time of sunrise.
-            sunset (datetime.time, optional): Time of sunset.
-            morning_twilight (datetime.time, optional): Time of morning twilight.
-            night_twilight (datetime.time, optional): Time of night twilight.
-            midday_period_begins (datetime.time, optional): Time when midday period begins.
-            midday_period_ends (datetime.time, optional): Time when midday period ends.
-            user_time (datetime, optional): User-defined time.
-
-        Single Responsibility: Initialize the SunTimes object with provided sun times and user time.
-        """
-        self.sunrise = sunrise
-        self.sunset = sunset
-        self.morning_twilight = morning_twilight
-        self.night_twilight = night_twilight
-        self.midday_period_begins = midday_period_begins
-        self.midday_period_ends = midday_period_ends
-        self.user_time = user_time
+    sunrise: Optional[time] = None
+    sunset: Optional[time] = None
+    morning_twilight: Optional[time] = None
+    night_twilight: Optional[time] = None
+    midday_period_begins: Optional[time] = None
+    midday_period_ends: Optional[time] = None
+    user_time: Optional[datetime] = field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     def set_user_time(self) -> None:
         """
-        See base class 'AbstractSunTimes' for full method documentation.
+        Sets the user time to the current UTC time if not already set.
         """
         self.user_time = datetime.now(timezone.utc)
 
     def combine_times_with_date(self) -> None:
         """
-        See base class 'AbstractSunTimes' for full method documentation.
+        Combines sun times with the current date to create full datetime objects.
         """
-        self.set_user_time()
-
         date = self.user_time.date()
-
-        self.sunrise = datetime.combine(date, self.sunrise, tzinfo=timezone.utc)
-        self.sunset = datetime.combine(date, self.sunset, tzinfo=timezone.utc)
-        self.morning_twilight = datetime.combine(
-            date, self.morning_twilight, tzinfo=timezone.utc
+        self.sunrise = (
+            datetime.combine(date, self.sunrise, tzinfo=timezone.utc)
+            if self.sunrise
+            else None
         )
-        self.night_twilight = datetime.combine(
-            date, self.night_twilight, tzinfo=timezone.utc
+        self.sunset = (
+            datetime.combine(date, self.sunset, tzinfo=timezone.utc)
+            if self.sunset
+            else None
+        )
+        self.morning_twilight = (
+            datetime.combine(date, self.morning_twilight, tzinfo=timezone.utc)
+            if self.morning_twilight
+            else None
+        )
+        self.night_twilight = (
+            datetime.combine(date, self.night_twilight, tzinfo=timezone.utc)
+            if self.night_twilight
+            else None
+        )
+        self.midday_period_begins = (
+            datetime.combine(date, self.midday_period_begins, tzinfo=timezone.utc)
+            if self.midday_period_begins
+            else None
+        )
+        self.midday_period_ends = (
+            datetime.combine(date, self.midday_period_ends, tzinfo=timezone.utc)
+            if self.midday_period_ends
+            else None
         )
 
     def __repr__(self) -> str:
@@ -168,8 +171,6 @@ class SunTimes(AbstractSunTimes):
 
         Returns:
             str: A string representation of the sun times.
-
-        Single Responsibility: Represent the sun times as a string.
         """
         return (
             f"SunTimes(sunrise={self.sunrise}, sunset={self.sunset}, "
