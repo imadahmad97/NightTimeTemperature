@@ -24,14 +24,10 @@ from .process_response.process_response_utils.sun_times_api import SunTimesAPI
 from .calculate_temp.calculate_temp import CalculateTemp
 
 
-def main(lat: float, lng: float) -> Response:
+def main() -> Response:
     """
-    Fetches sun times data based on latitude and longitude, processes the API response,
-    and calculates the temperature.
-
-    Args:
-        lat (float): The latitude for the API call.
-        lng (float): The longitude for the API call.
+    Main function to handle one user request end to end, obtaining the request and returning and
+    response.
 
     Returns:
         Response: A JSON response containing the calculated temperature.
@@ -44,7 +40,8 @@ def main(lat: float, lng: float) -> Response:
     Single Responsibility: Manage the entire process of fetching, processing sun times data, and
     calculating temperature.
     """
-    response = SunTimesAPI.fetch_sun_times(lat, lng)
+
+    response = SunTimesAPI.fetch_sun_times()
     api_processor = ProcessAPICall()
     processed_api_response = api_processor.process_api_call(response)
     return jsonify(temperature=CalculateTemp.calculate_temp(processed_api_response))

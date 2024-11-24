@@ -13,7 +13,7 @@ Dependencies:
       temperature.
 """
 
-from flask import request, Response
+from flask import Response
 from .main import main
 
 
@@ -35,16 +35,13 @@ def register_routes(app):
         """
         Route for fetching and processing sun times data to calculate the night-time temperature.
 
-        This route handles GET requests, extracts latitude and longitude from the query parameters,
-        and calls the `main` function to fetch, process sun times data, and calculate the
-        temperature.
+        This route handles GET requests and calls the `main` function to fetch, process sun times
+        data, and calculate the temperature.
 
         Returns:
             Response: A JSON response containing the calculated temperature.
 
         Single Responsibility: Handle the GET request to calculate the night-time temperature.
         """
-        lat = request.args.get("lat", type=float)
-        lng = request.args.get("lng", type=float)
 
-        return main(lat, lng)
+        return main()

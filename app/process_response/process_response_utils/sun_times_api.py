@@ -20,7 +20,7 @@ Dependencies:
 """
 
 import requests
-from flask import current_app
+from flask import current_app, request
 
 
 class SunTimesAPI:
@@ -33,6 +33,21 @@ class SunTimesAPI:
 
     Single responsibility: Fetch sun times data from an external API.
     """
+
+    @staticmethod
+    def get_args() -> tuple:
+        """
+        Gets the latitude and longitude arguments from the user request.
+
+        Returns:
+            lat (float): The latitude for the API call.
+            lng (float): The longitude for the API call
+
+        Single Responsibility: Get the user's provided latitude and longitude
+        """
+        lat = request.args.get("lat", type=float)
+        lng = request.args.get("lng", type=float)
+        return lat, lng
 
     @staticmethod
     def construct_api_url(lat: float, lng: float) -> str:
@@ -51,19 +66,16 @@ class SunTimesAPI:
         return f"{current_app.config['SUNRISE_SUNSET_API_BASE_URL']}lat={lat}&lng={lng}"
 
     @staticmethod
-    def fetch_sun_times(lat: float, lng: float) -> requests.models.Response:
+    def fetch_sun_times() -> requests.models.Response:
         """
         Fetches sun times data from an external API based on latitude and longitude.
-
-        Args:
-            lat (float): The latitude for the API call.
-            lng (float): The longitude for the API call.
 
         Returns:
             requests.models.Response: The raw HTTP response from the API.
 
         Single Responsibility: Make an API call to fetch sun times data.
         """
+        lat, lng = SunTimesAPI.get_args()
         url = SunTimesAPI.construct_api_url(lat, lng)
         response = requests.get(url, timeout=20)
         return response

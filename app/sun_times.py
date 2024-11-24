@@ -55,13 +55,19 @@ class AbstractSunTimes(ABC):
         """
         Sets the user time, defaulting to the current UTC time.
 
+        Returns:
+            sun_times.user_time: A SunTimes class attribute containing user_time.
+
         Single Responsibility: Set the user time to the current UTC time.
         """
 
     @abstractmethod
-    def combine_times_with_date(self):
+    def combine_times_with_date(self, date):
         """
         Combines sun times with a given date, defaulting to today.
+
+        Args:
+            sun_times_dict (Dict[str, datetime.time]): A dictionary containing sun times.
 
         Single Responsibility: Combine sun times with today's date.
         """
@@ -93,8 +99,8 @@ class AbstractSunTimes(ABC):
             morning_twilight=sun_times_dict.get("morning_twilight"),
             night_twilight=sun_times_dict.get("night_twilight"),
         )
-        sun_times.set_user_time()
-        sun_times.combine_times_with_date()
+        user_time = sun_times.set_user_time()
+        sun_times.combine_times_with_date(user_time.date())
         return sun_times
 
 
@@ -102,15 +108,6 @@ class AbstractSunTimes(ABC):
 class SunTimes(AbstractSunTimes):
     """
     A concrete implementation of AbstractSunTimes for handling and processing sun times.
-
-    Attributes:
-        sunrise (Optional[time]): Time of sunrise.
-        sunset (Optional[time]): Time of sunset.
-        morning_twilight (Optional[time]): Time of morning twilight.
-        night_twilight (Optional[time]): Time of night twilight.
-        midday_period_begins (Optional[time]): Time when the midday period begins.
-        midday_period_ends (Optional[time]): Time when the midday period ends.
-        user_time (Optional[datetime]): User-defined time or current UTC time by default.
     """
 
     sunrise: Optional[time] = None
@@ -128,12 +125,12 @@ class SunTimes(AbstractSunTimes):
         Sets the user time to the current UTC time if not already set.
         """
         self.user_time = datetime.now(timezone.utc)
+        return self.user_time
 
-    def combine_times_with_date(self) -> None:
+    def combine_times_with_date(self, date) -> None:
         """
         Combines sun times with the current date to create full datetime objects.
         """
-        date = self.user_time.date()
         self.sunrise = (
             datetime.combine(date, self.sunrise, tzinfo=timezone.utc)
             if self.sunrise
