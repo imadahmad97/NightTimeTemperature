@@ -28,6 +28,7 @@ def create_app() -> Flask:
 
     # Load the configuration (prod or dev) for the app
     app.config.from_pyfile("../config.py")
+    print(app.config["PROFILE"])
 
     # Register all routes with the application
     register_routes(app)

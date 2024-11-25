@@ -20,7 +20,7 @@ Dependencies:
 """
 
 import requests
-from flask import current_app, request
+from flask import current_app, request, jsonify, abort
 
 
 class SunTimesAPI:
@@ -37,7 +37,7 @@ class SunTimesAPI:
     @staticmethod
     def get_args() -> tuple:
         """
-        Gets the latitude and longitude arguments from the user request.
+        Gets the latitude and longitude arguments from the user request and validates them.
 
         Returns:
             lat (float): The latitude for the API call.
@@ -47,6 +47,17 @@ class SunTimesAPI:
         """
         lat = request.args.get("lat", type=float)
         lng = request.args.get("lng", type=float)
+
+        # Validate latitude and longitude
+        if lat is None or lng is None:
+            abort(400, description="Latitude and longitude are required.")
+
+        if not (-90 <= lat <= 90):
+            abort(400, description="Latitude must be between -90 and 90.")
+
+        if not (-180 <= lng <= 180):
+            abort(400, description="Longitude must be between -180 and 180.")
+
         return lat, lng
 
     @staticmethod

@@ -1,26 +1,9 @@
-services:
-  # Service for the development environment
-  dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - PROFILE=dev
-    volumes:
-      - .:/app
-    profiles:
-      - dev
+version: '3.8'
 
-  pr:
-  # Service for the production-ready environment
-    build:
-      context: .
-      dockerfile: Dockerfile
+services:
+  flask-app:
+    build: .
     ports:
       - "8080:8080"
     environment:
-      - PROFILE=pr
-    profiles:
-      - pr
+      - PROFILE=${PROFILE:-Pr}  # Default to "Pr" if PROFILE is not set
