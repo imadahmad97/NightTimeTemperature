@@ -1,20 +1,62 @@
+"""
+This module provides unit tests for the process_api_call method in the ProcessAPICall class.
+
+The ProcessAPICall class processes the API response from the sunrise-sunset API into a SunTimes 
+object.
+
+The tests verify the correct processing of the API response into a SunTimes object, handling various
+edge cases
+
+Tests:
+    - test_no_adjustments: Tests the process_api_call method with no adjustments needed.
+    - test_sunrise_before_morning_twilight_adjustment: Tests the process_api_call method with 
+      sunrise before morning twilight.
+    - test_sunset_before_sunrise_adjustment: Tests the process_api_call method with sunset before 
+      sunrise.
+    - test_night_twilight_before_sunset_adjustment: Tests the process_api_call method with night 
+      twilight before sunset.
+"""
+
 import unittest
-from .process_response import ProcessAPICall
-from flask import Flask
-from unittest.mock import patch, MagicMock
 from datetime import datetime, timezone
-from app.sun_times import SunTimes
-from freezegun import freeze_time
+from unittest.mock import patch, MagicMock
 import warnings
+from flask import Flask
+from freezegun import freeze_time
+from app.sun_times import SunTimes
+from .process_response import ProcessAPICall
 
 
 class TestProcessAPICall(unittest.TestCase):
+    """
+    Unit tests for the process_api_call method.
+
+    This test suite includes tests to verify the correct processing of API responses
+    into SunTimes objects, handling various edge cases such as no adjustments needed,
+    sunrise before morning twilight, sunset before sunrise, and night twilight before sunset.
+
+    Methods:
+        - setUp: Initializes the Flask application and pushes the application and request contexts.
+        - test_no_adjustments: Tests the process_api_call method with no adjustments needed.
+        - test_sunrise_before_morning_twilight_adjustment: Tests the process_api_call method with
+        sunrise before morning twilight.
+        - test_sunset_before_sunrise_adjustment: Tests the process_api_call method with sunset
+        before sunrise.
+        - test_night_twilight_before_sunset_adjustment: Tests the process_api_call method with night
+        twilight before sunset.
+    """
 
     def setUp(self):
+        """
+        Set up the Flask application and push the application and request contexts. This method is
+        called before each test method.
+
+        """
         warnings.filterwarnings(
             "ignore",
             category=DeprecationWarning,
-            message="The '__version__' attribute is deprecated and will be removed in Werkzeug 3.1.",
+            message="""The '__version__' attribute is deprecated and will be removed in Werkzeug 3.1
+            .""",
         )
         self.app = Flask(__name__)
         self.app.config["HI_TEMP"] = 6000
@@ -36,6 +78,18 @@ class TestProcessAPICall(unittest.TestCase):
     @freeze_time("2024-01-01 10:00:00", tz_offset=0)
     @patch("requests.get")  # Mock requests.get
     def test_no_adjustments(self, mock_get):
+        """
+        Test the process_api_call method with no adjustments needed.
+
+        This test verifies that the method correctly processes the API response when
+        no adjustments to the sunrise and sunset times are necessary.
+
+        Args:
+            mock_get (MagicMock): Mock object for requests.get.
+
+        Assertions:
+            - Verify that the processed SunTimes object matches the expected values.
+        """
         # Create a mock response object
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -59,8 +113,8 @@ class TestProcessAPICall(unittest.TestCase):
         # Assign the mock response to requests.get
         mock_get.return_value = mock_response
 
+        # Call process_api_call method
         process_api = ProcessAPICall()
-        # Call your function that processes the API response
         response = process_api.process_api_call()
 
         expected_response = SunTimes(
@@ -88,6 +142,18 @@ class TestProcessAPICall(unittest.TestCase):
     @freeze_time("2024-01-01 10:00:00", tz_offset=0)
     @patch("requests.get")  # Mock requests.get
     def test_sunrise_before_morning_twilight_adjustment(self, mock_get):
+        """
+        Test the process_api_call method with sunrise before morning twilight.
+
+        This test verifies that the method correctly processes the API response when
+        the sunrise time is before the morning twilight time.
+
+        Args:
+            mock_get (MagicMock): Mock object for requests.get.
+
+        Assertions:
+            - Verify that the processed SunTimes object matches the expected values.
+        """
         # Create a mock response object
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -139,6 +205,18 @@ class TestProcessAPICall(unittest.TestCase):
     @freeze_time("2024-01-01 10:00:00", tz_offset=0)
     @patch("requests.get")  # Mock requests.get
     def test_sunset_before_sunrise_adjustment(self, mock_get):
+        """
+        Test the process_api_call method with sunset before sunrise.
+
+        This test verifies that the method correctly processes the API response when
+        the sunset time is before the sunrise time.
+
+        Args:
+            mock_get (MagicMock): Mock object for requests.get.
+
+        Assertions:
+            - Verify that the processed SunTimes object matches the expected values.
+        """
         # Create a mock response object
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -190,6 +268,18 @@ class TestProcessAPICall(unittest.TestCase):
     @freeze_time("2024-01-01 10:00:00", tz_offset=0)
     @patch("requests.get")  # Mock requests.get
     def test_night_twilight_before_sunset_adjustment(self, mock_get):
+        """
+        Test the process_api_call method with night twilight before sunset.
+
+        This test verifies that the method correctly processes the API response when
+        the night twilight time is before the sunset time.
+
+        Args:
+            mock_get (MagicMock): Mock object for requests.get.
+
+        Assertions:
+            - Verify that the processed SunTimes object matches the expected values.
+        """
         # Create a mock response object
         mock_response = MagicMock()
         mock_response.status_code = 200

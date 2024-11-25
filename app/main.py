@@ -20,25 +20,19 @@ Dependencies:
 
 from flask import jsonify, Response
 from .process_response.process_response import ProcessAPICall
-from .process_response.process_response_utils.sun_times_api import SunTimesAPI
 from .calculate_temp.calculate_temp import CalculateTemp
 
 
 def main() -> Response:
     """
-    Main function to handle one user request end to end, obtaining the request and returning and
-    response.
-
-    Returns:
-        Response: A JSON response containing the calculated temperature.
+    Main function to handle one user request end to end, and returning the response.
 
     Process:
         1. Fetches sun times data using `SunTimesAPI`.
         2. Processes the API response using `ProcessAPICall`.
         3. Calculates the temperature using `CalculateTemp`.
 
-    Single Responsibility: Manage the entire process of fetching, processing sun times data, and
-    calculating temperature.
+    Single Responsibility: Handles one user request end to end.
     """
 
     api_processor = ProcessAPICall()
