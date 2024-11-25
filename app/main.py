@@ -19,6 +19,7 @@ Dependencies:
 """
 
 from flask import jsonify, Response
+from app.sun_times import SunTimes
 from .process_response.process_response import ProcessAPICall
 from .calculate_temp.calculate_temp import CalculateTemp
 
@@ -35,6 +36,6 @@ def main() -> Response:
     Single Responsibility: Handles one user request end to end.
     """
 
-    api_processor = ProcessAPICall()
-    processed_api_response = api_processor.process_api_call()
+    api_processor: ProcessAPICall = ProcessAPICall()
+    processed_api_response: SunTimes = api_processor.process_api_call()
     return jsonify(temperature=CalculateTemp.calculate_temp(processed_api_response))

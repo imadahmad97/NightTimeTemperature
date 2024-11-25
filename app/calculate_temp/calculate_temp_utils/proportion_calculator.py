@@ -112,7 +112,9 @@ class ProportionCalculator(AbstractPropoprtionCalculator):
         """
         See base class `AbstractProportionCalculator` for full method documentation.
         """
-        morning_twilight_length = sun_times.sunrise - sun_times.morning_twilight
+        morning_twilight_length: timedelta = (
+            sun_times.sunrise - sun_times.morning_twilight
+        )
         return self.calculate_user_proportion(
             sun_times.user_time,
             sun_times.morning_twilight,
@@ -123,7 +125,7 @@ class ProportionCalculator(AbstractPropoprtionCalculator):
         """
         See base class `AbstractProportionCalculator` for full method documentation.
         """
-        night_twilight_length = sun_times.night_twilight - sun_times.sunset
+        night_twilight_length: timedelta = sun_times.night_twilight - sun_times.sunset
         return self.calculate_user_proportion(
             sun_times.user_time,
             sun_times.midday_period_ends,

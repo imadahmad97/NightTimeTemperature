@@ -86,8 +86,8 @@ class TimeIntervalCalculator(AbstractTimeIntervalCalculator):
         See base class `AbstractTimeIntervalCalculator` for full method documentation.
         """
         prop_calculator = ProportionCalculator()
-        morning_prop = prop_calculator.get_user_prop_morning(sun_times)
-        night_prop = prop_calculator.get_user_prop_night(sun_times)
+        morning_prop: float = prop_calculator.get_user_prop_morning(sun_times)
+        night_prop: float = prop_calculator.get_user_prop_night(sun_times)
         return morning_prop, night_prop
 
     def get_interval(self, sun_times: SunTimes) -> int:
@@ -95,6 +95,8 @@ class TimeIntervalCalculator(AbstractTimeIntervalCalculator):
         See base class `AbstractTimeIntervalCalculator` for full method documentation.
         """
 
+        morning_prop: float
+        night_prop: float
         morning_prop, night_prop = self.instantiate_proportion(sun_times)
         if (
             sun_times.midday_period_begins

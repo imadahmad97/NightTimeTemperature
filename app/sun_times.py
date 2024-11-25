@@ -125,9 +125,9 @@ class SunTimes(AbstractSunTimes):
         """
         Sets the user time to the current UTC time if not already set.
         """
-        self.user_time = datetime.datetime.now(datetime.timezone.utc).replace(
-            microsecond=0
-        )
+        self.user_time: datetime.datetime = datetime.datetime.now(
+            datetime.timezone.utc
+        ).replace(microsecond=0)
 
         return self.user_time
 
@@ -135,7 +135,7 @@ class SunTimes(AbstractSunTimes):
         """
         Combines sun times with the current date to create full datetime objects.
         """
-        self.sunrise = (
+        self.sunrise: datetime.datetime = (
             datetime.datetime.combine(date, self.sunrise, tzinfo=datetime.timezone.utc)
             if self.sunrise
             else None
@@ -145,28 +145,28 @@ class SunTimes(AbstractSunTimes):
             if self.sunset
             else None
         )
-        self.morning_twilight = (
+        self.morning_twilight: datetime.datetime = (
             datetime.datetime.combine(
                 date, self.morning_twilight, tzinfo=datetime.timezone.utc
             )
             if self.morning_twilight
             else None
         )
-        self.night_twilight = (
+        self.night_twilight: datetime.datetime = (
             datetime.datetime.combine(
                 date, self.night_twilight, tzinfo=datetime.timezone.utc
             )
             if self.night_twilight
             else None
         )
-        self.midday_period_begins = (
+        self.midday_period_begins: datetime.datetime = (
             datetime.datetime.combine(
                 date, self.midday_period_begins, tzinfo=datetime.timezone.utc
             )
             if self.midday_period_begins
             else None
         )
-        self.midday_period_ends = (
+        self.midday_period_ends: datetime.datetime = (
             datetime.datetime.combine(
                 date, self.midday_period_ends, tzinfo=datetime.timezone.utc
             )

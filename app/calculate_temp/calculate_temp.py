@@ -5,6 +5,7 @@ Classes:
     data
 """
 
+from typing import List
 from app.sun_times import SunTimes
 from .calculate_temp_utils.get_user_time_interval import TimeIntervalCalculator
 
@@ -35,7 +36,7 @@ class CalculateTemp:
         Single Responsibility: Use the `GetTemp` utility to calculate the temperature from sun times
         data.
         """
-        temp_calculator = TimeIntervalCalculator()
+        temp_calculator: TimeIntervalCalculator = TimeIntervalCalculator()
         return temp_calculator.get_interval(sun_times)
 
     @staticmethod
@@ -51,7 +52,7 @@ class CalculateTemp:
 
         Single Responsibility: Verify the completeness of a SunTimes object.
         """
-        required_attributes = [
+        required_attributes: List[str] = [
             "sunrise",
             "sunset",
             "morning_twilight",
