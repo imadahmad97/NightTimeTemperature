@@ -59,11 +59,7 @@ class TestProcessAPICall(unittest.TestCase):
             .""",
         )
         self.app = Flask(__name__)
-        self.app.config["HI_TEMP"] = 6000
-        self.app.config["LO_TEMP"] = 2700
-        self.app.config["SUNRISE_SUNSET_API_BASE_URL"] = (
-            "https://api.sunrise-sunset.org/json?"
-        )
+        self.app.config.from_pyfile("../../config.py")
 
         # Push the application context
         self.app_context = self.app.app_context()

@@ -23,10 +23,10 @@ Dependencies:
 """
 
 from app.sun_times import SunTimes
+from app.process_response.process_response_utils.sun_times_api import SunTimesAPI
 from .process_response_utils.response_handler import ResponseHandler
 from .process_response_utils.midday_calculator import MiddayPeriodCalculator
 from .process_response_utils.date_adjustment import DateAdjustment
-from app.process_response.process_response_utils.sun_times_api import SunTimesAPI
 
 
 class ProcessAPICall:
