@@ -102,12 +102,15 @@ class AbstractDateAdjustment(ABC):
         Single Responsibility: Manage the overall process of adjusting dates based on sun times.
         """
         if sun_times.sunrise < sun_times.morning_twilight:
+            print("running 1")
             sun_times = self.sunrise_before_twilight(sun_times)
 
         if sun_times.sunset < sun_times.sunrise:
+            print("running 2")
             sun_times = self.sunset_before_sunrise(sun_times)
 
         if sun_times.night_twilight < sun_times.sunset:
+            print("running 3")
             sun_times = self.night_twilight_before_sunset(sun_times)
 
         return sun_times
@@ -141,6 +144,8 @@ class DateAdjustment(AbstractDateAdjustment):
             sun_times.user_time += timedelta(days=1)
         sun_times.sunset += timedelta(days=1)
         sun_times.night_twilight += timedelta(days=1)
+        print(sun_times.sunset)
+        print(sun_times.night_twilight)
 
         return sun_times
 

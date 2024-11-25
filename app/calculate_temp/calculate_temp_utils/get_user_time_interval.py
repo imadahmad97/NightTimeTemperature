@@ -94,11 +94,11 @@ class TimeIntervalCalculator(AbstractTimeIntervalCalculator):
         """
         See base class `AbstractTimeIntervalCalculator` for full method documentation.
         """
-        print(f"mpb: {sun_times.midday_period_begins}")
-        print(f"mpe: {sun_times.midday_period_ends}")
-        print(f"user_time: {sun_times.user_time}")
-        print(f"morning_twilight: {sun_times.morning_twilight}")
-        print(f"night_twilight: {sun_times.night_twilight}")
+        # print(f"mpb: {sun_times.midday_period_begins}")
+        # (f"mpe: {sun_times.midday_period_ends}")
+        # print(f"user_time: {sun_times.user_time}")
+        # print(f"morning_twilight: {sun_times.morning_twilight}")
+        # print(f"night_twilight: {sun_times.night_twilight}")
         morning_prop, night_prop = self.instantiate_proportion(sun_times)
         if (
             sun_times.midday_period_begins

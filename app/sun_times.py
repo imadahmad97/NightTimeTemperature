@@ -125,7 +125,10 @@ class SunTimes(AbstractSunTimes):
         """
         Sets the user time to the current UTC time if not already set.
         """
-        self.user_time = datetime.datetime.now(datetime.timezone.utc)
+        self.user_time = datetime.datetime.now(datetime.timezone.utc).replace(
+            microsecond=0
+        )
+
         return self.user_time
 
     def combine_times_with_date(self, date) -> None:

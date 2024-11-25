@@ -26,6 +26,7 @@ from app.sun_times import SunTimes
 from .process_response_utils.response_handler import ResponseHandler
 from .process_response_utils.midday_calculator import MiddayPeriodCalculator
 from .process_response_utils.date_adjustment import DateAdjustment
+from freezegun import freeze_time
 
 
 class ProcessAPICall:
@@ -66,7 +67,6 @@ class ProcessAPICall:
             "civil_twilight_begin",
             "civil_twilight_end",
         ]
-        print(response.json)
         for key in required_keys:
             if key not in response.json()["results"]:
                 raise RuntimeError(f"Invalid API response format: '{key}' key missing")
@@ -90,7 +90,6 @@ class ProcessAPICall:
         Single Responsibility: Manage the entire process of fetching and processing sun times data.
         """
         self.validate_response(response)
-        print(response)
 
         formatted_response = self.response_handler.handle_response(response)
         raw_sun_times_object = self.sun_times_builder.process_sun_times(
@@ -99,6 +98,7 @@ class ProcessAPICall:
         date_adjusted_sun_times_object = self.date_adjustment.adjust_dates(
             raw_sun_times_object
         )
+
         processed_sun_times_object = self.midday_calculator.process_midday_period(
             date_adjusted_sun_times_object
         )
