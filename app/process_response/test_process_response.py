@@ -5,15 +5,33 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime, timezone
 from app.sun_times import SunTimes
 from freezegun import freeze_time
+import warnings
 
 
 class TestProcessAPICall(unittest.TestCase):
+
     def setUp(self):
+        warnings.filterwarnings(
+            "ignore",
+            category=DeprecationWarning,
+            message="The '__version__' attribute is deprecated and will be removed in Werkzeug 3.1.",
+        )
         self.app = Flask(__name__)
-        self.app_context = self.app.app_context()
         self.app.config["HI_TEMP"] = 6000
         self.app.config["LO_TEMP"] = 2700
+        self.app.config["SUNRISE_SUNSET_API_BASE_URL"] = (
+            "https://api.sunrise-sunset.org/json?"
+        )
+
+        # Push the application context
+        self.app_context = self.app.app_context()
         self.app_context.push()
+
+        # Push the request context
+        self.request_context = self.app.test_request_context()
+        self.request_context.push()
+
+        self.client = self.app.test_client()
 
     @freeze_time("2024-01-01 10:00:00", tz_offset=0)
     @patch("requests.get")  # Mock requests.get
@@ -43,7 +61,7 @@ class TestProcessAPICall(unittest.TestCase):
 
         process_api = ProcessAPICall()
         # Call your function that processes the API response
-        response = process_api.process_api_call(mock_response)
+        response = process_api.process_api_call()
 
         expected_response = SunTimes(
             sunrise=datetime(2024, 1, 1, 5, 0, 0, tzinfo=timezone.utc),
@@ -95,7 +113,7 @@ class TestProcessAPICall(unittest.TestCase):
 
         process_api = ProcessAPICall()
         # Call your function that processes the API response
-        response = process_api.process_api_call(mock_response)
+        response = process_api.process_api_call()
         expected_response = SunTimes(
             sunrise=datetime(2024, 1, 2, 0, 30, 0, tzinfo=timezone.utc),
             sunset=datetime(2024, 1, 2, 19, 0, 0, tzinfo=timezone.utc),
@@ -146,7 +164,7 @@ class TestProcessAPICall(unittest.TestCase):
 
         process_api = ProcessAPICall()
         # Call your function that processes the API response
-        response = process_api.process_api_call(mock_response)
+        response = process_api.process_api_call()
         expected_response = SunTimes(
             sunrise=datetime(2024, 1, 1, 22, 30, 0, tzinfo=timezone.utc),
             sunset=datetime(2024, 1, 2, 6, 30, 0, tzinfo=timezone.utc),
@@ -197,7 +215,7 @@ class TestProcessAPICall(unittest.TestCase):
 
         process_api = ProcessAPICall()
         # Call your function that processes the API response
-        response = process_api.process_api_call(mock_response)
+        response = process_api.process_api_call()
         expected_response = SunTimes(
             sunrise=datetime(2024, 1, 1, 16, 30, 0, tzinfo=timezone.utc),
             sunset=datetime(2024, 1, 1, 23, 30, 0, tzinfo=timezone.utc),

@@ -26,7 +26,7 @@ from app.sun_times import SunTimes
 from .process_response_utils.response_handler import ResponseHandler
 from .process_response_utils.midday_calculator import MiddayPeriodCalculator
 from .process_response_utils.date_adjustment import DateAdjustment
-from freezegun import freeze_time
+from app.process_response.process_response_utils.sun_times_api import SunTimesAPI
 
 
 class ProcessAPICall:
@@ -71,7 +71,7 @@ class ProcessAPICall:
             if key not in response.json()["results"]:
                 raise RuntimeError(f"Invalid API response format: '{key}' key missing")
 
-    def process_api_call(self, response) -> SunTimes:
+    def process_api_call(self) -> SunTimes:
         """
         Processes an API call to fetch and process sun times data.
 
@@ -89,6 +89,8 @@ class ProcessAPICall:
 
         Single Responsibility: Manage the entire process of fetching and processing sun times data.
         """
+
+        response = SunTimesAPI.fetch_sun_times()
         self.validate_response(response)
 
         formatted_response = self.response_handler.handle_response(response)

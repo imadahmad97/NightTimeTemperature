@@ -41,7 +41,6 @@ def main() -> Response:
     calculating temperature.
     """
 
-    response = SunTimesAPI.fetch_sun_times()
     api_processor = ProcessAPICall()
-    processed_api_response = api_processor.process_api_call(response)
+    processed_api_response = api_processor.process_api_call()
     return jsonify(temperature=CalculateTemp.calculate_temp(processed_api_response))
