@@ -66,6 +66,7 @@ class ProcessAPICall:
             "civil_twilight_begin",
             "civil_twilight_end",
         ]
+        print(response.json)
         for key in required_keys:
             if key not in response.json()["results"]:
                 raise RuntimeError(f"Invalid API response format: '{key}' key missing")
