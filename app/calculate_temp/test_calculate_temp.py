@@ -1,8 +1,5 @@
 import unittest
 from app.sun_times import SunTimes
-from app.calculate_temp.calculate_temp_utils.get_user_time_interval import (
-    TimeIntervalCalculator,
-)
 from app.calculate_temp.calculate_temp import CalculateTemp
 from datetime import datetime
 from flask import Flask
@@ -45,14 +42,28 @@ class TestCalculateTemp(unittest.TestCase):
             calculated_temp, 2700
         )  # Adjust expected value based on real logic
 
-    def morning_twilight_period(self):
+    def test_morning_twilight_period(self):
         self.sun_times.user_time = datetime(2024, 1, 1, 5, 45)
 
         calculated_temp = CalculateTemp.calculate_temp(self.sun_times)
-
+        expected_temp = self.app.config["LO_TEMP"] + (
+            self.app.config["HI_TEMP"] - self.app.config["LO_TEMP"]
+        ) * (1 / 4)
         # Assert that the temperature is correctly calculated
         self.assertEqual(
-            calculated_temp, 2700
+            calculated_temp, expected_temp
+        )  # Adjust expected value based on real logic
+
+    def test_night_twilight_period(self):
+        self.sun_times.user_time = datetime(2024, 1, 1, 17, 45)
+
+        calculated_temp = CalculateTemp.calculate_temp(self.sun_times)
+        expected_temp = self.app.config["HI_TEMP"] - (
+            self.app.config["HI_TEMP"] - self.app.config["LO_TEMP"]
+        ) * (1 / 4)
+        # Assert that the temperature is correctly calculated
+        self.assertEqual(
+            calculated_temp, expected_temp
         )  # Adjust expected value based on real logic
 
 

@@ -90,6 +90,7 @@ class ProcessAPICall:
         Single Responsibility: Manage the entire process of fetching and processing sun times data.
         """
         self.validate_response(response)
+        print(response)
 
         formatted_response = self.response_handler.handle_response(response)
         raw_sun_times_object = self.sun_times_builder.process_sun_times(
